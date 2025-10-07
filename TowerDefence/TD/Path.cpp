@@ -3,9 +3,9 @@
 #include "utils.h"
 #include "set"
 
-Path::Path(Rectf viewport)
-	:m_ViewPort{ viewport },
-	m_Edge{ }
+Path::Path(const Rectf viewport)
+	:m_Edge{ },
+	m_ViewPort{ viewport }
 {
 	m_Waypoints = GenerateRandomPath();
 }
@@ -15,16 +15,19 @@ void Path::Draw() const
 	utils::SetColor(Color4f(0.f, 0.f, 1.f, 1.f));
 	for (int i{ 1 }; i < m_Waypoints.size(); i++)
 	{
-		utils::DrawLine(m_Waypoints[i - 1], m_Waypoints[i]);
+		utils::DrawLine(m_Waypoints[i - 1], m_Waypoints[i], 5.f);
 	}
+
+	utils::SetColor(Color4f(1.f, 0.f, 0.f, 1.f));
+	utils::DrawEllipse(m_Waypoints[0], 20.f, 20.f);
 }
 
-Vector2f Path::GetNextPosition(int nextPos)
+Vector2f Path::GetNextPosition(const int nextPos) const
 {
 	return m_Waypoints.at(nextPos);
 }
 
-int Path::GetSize()
+int Path::GetSize() const
 {
 	return m_Waypoints.size();
 }
@@ -36,15 +39,15 @@ Vector2f Path::GetRandomPointOnEdge(Edge edge)
 
 std::vector<Vector2f> Path::GenerateRandomPath()
 {
-	int maxSteps{ 20 };
-	int stepSize{ 100 };
+	constexpr int maxSteps{ 10 };
+	constexpr int stepSize{ 100 };
 
 	//select edges
 	m_Edge = static_cast<Edge>(rand() % 4);
 
 	//get a random position on the edge
-	Vector2f startPos = GetRandomPointOnEdge(m_Edge);
-	float endX = m_ViewPort.width;
+	const Vector2f startPos = GetRandomPointOnEdge(m_Edge);
+	const float endX = m_ViewPort.width;
 
 	std::vector<Vector2f> path;
 
@@ -59,7 +62,7 @@ std::vector<Vector2f> Path::GenerateRandomPath()
 	currentPos = Vector2f(currentPos.x + stepSize, currentPos.y);
 	path.push_back(currentPos);
 
-	visitedPos.insert({ int(currentPos.x / stepSize), int(currentPos.y / stepSize) });
+	visitedPos.insert({ static_cast<int>(currentPos.x / stepSize), static_cast<int>(currentPos.y / stepSize) });
 
 	for (int i{ 0 }; i < maxSteps; i++)
 	{
@@ -68,7 +71,7 @@ std::vector<Vector2f> Path::GenerateRandomPath()
 
 		//moving closer to end
 
-		if (rand() % 2 == 0)
+		if (i % 2 == 0)
 		{
 			if (rand() % 2 == 0)
 			{
@@ -86,7 +89,6 @@ std::vector<Vector2f> Path::GenerateRandomPath()
 
 		//clamp 50 from edge
 
-
 		if (nextPos.y < stepSize)
 		{
 			nextPos.y = stepSize;
@@ -96,14 +98,13 @@ std::vector<Vector2f> Path::GenerateRandomPath()
 			nextPos.y = m_ViewPort.height - stepSize;
 		}
 		
-		std::pair<int,int> gridPos = std::make_pair( int(nextPos.x / stepSize), int(nextPos.y / stepSize) );
+		std::pair<int,int> gridPos = std::make_pair( static_cast<int>(nextPos.x / stepSize), static_cast<int>(nextPos.y / stepSize) );
 
-		Vector2f tempPos{ nextPos };
+		const Vector2f tempPos{ nextPos };
 
 		while (visitedPos.count(gridPos) != 0)
 		{
 			nextPos = tempPos;
-
 
 			if (rand() % 2 == 0)
 			{
@@ -130,12 +131,9 @@ std::vector<Vector2f> Path::GenerateRandomPath()
 				nextPos.y = m_ViewPort.height - stepSize;
 			}
 
-			gridPos = std::make_pair(int(nextPos.x / stepSize), int(nextPos.y / stepSize));
-
-			
+			gridPos = std::make_pair(static_cast<int>(nextPos.x / stepSize), static_cast<int>(nextPos.y / stepSize));
 		}
 		
-
 		visitedPos.insert(gridPos);
 		path.push_back(nextPos);
 		currentPos = nextPos;
@@ -145,19 +143,17 @@ std::vector<Vector2f> Path::GenerateRandomPath()
 		{
 			break;
 		}
-
 	}
-	//path.push_back(Vector2f(currentPos.y, endX));
 
 	return path;
 }
 
-Vector2f Path::GetFirstPosition()
+Vector2f Path::GetFirstPosition() const
 {
 	return m_Waypoints.at(0);
 }
 
-Path::Edge Path::GetEdge()
+Path::Edge Path::GetEdge() const
 {
 	return m_Edge;
 }

@@ -2,8 +2,8 @@
 #include "BaseGame.h"
 #include "vector"
 #include "list"
+#include "Texture.h"
 
-class Texture;
 class Path;
 class Enemy;
 class Tower;
@@ -32,13 +32,13 @@ public:
 private:
 
 	enum class GameState {
-		none,
+		pauze,
 		start,
 		mainloop,
 		gameOver
 	};
 
-	GameState m_GameState{ GameState::none };
+	GameState m_GameState{ GameState::pauze };
 
 
 	// FUNCTIONS
@@ -54,6 +54,8 @@ private:
 
 	void MakeNewWave();
 
+	void ResetText();
+
 	//MEMBERS
 
 	Rectf m_Playfield{ 0.f, 0.f, 500.f, GetViewPort().height };
@@ -64,48 +66,34 @@ private:
 
 	int m_Lives{ 20 };
 
-	Texture* m_LivesText;
-	Texture* m_RoundText;
-	Texture* m_TowerText;
+	Texture m_LivesText{ "Lives: 20", "Minecraft.ttf", 25, Color4f(0.f, 0.f, 0.f, 1.f) };
+	Texture m_RoundText{ "Press \'SPACE\' to start round", "Minecraft.ttf", 12, Color4f(0.f, 0.f, 0.f, 1.f) };
+	Texture m_TowerText{ "Towers: 3", "Minecraft.ttf", 25, Color4f(0.f, 0.f, 0.f, 1.f) };
+	Texture m_RemovalsText{ "Remove: 1", "Minecraft.ttf", 25, Color4f(0.f, 0.f, 0.f, 1.f) };
 
-	Texture* m_PauzeText;
-	Texture* m_StartText;
+	Texture m_PauzeText{ "PAUSE", "Minecraft.ttf", 100, Color4f(1.f, 1.f, 1.f, 1.f) };
+	Texture m_StartText{ "Press 'ESC' to start again", "Minecraft.ttf", 25, Color4f(1.f, 1.f, 1.f, 1.f) };
+	Texture m_RestartText{ "Press \'r\' to restart", "Minecraft.ttf", 25, Color4f(1.f, 1.f, 1.f, 1.f) };
 
 
-	bool m_ShowPlacement;
+	bool m_ShowPlacement{ false };
 
 	int m_RoundNr{ 1 };
+	int m_MaxTowers{ 3 };
+	int m_MaxRemoves{ 1 };
+
+	float m_WaveTimer{ 0.f };
 
 	// ------level 1 positions------
 
 	Vector2f m_FirstStartPos{ GetViewPort().width + 50, 325 };
 
-	std::vector<Vector2f> m_Waypoints
-	{
-		Vector2f(m_FirstStartPos),
-		Vector2f(450, 325),
-		Vector2f(450, 425),
-		Vector2f(350, 425),
-		Vector2f(350, 325),
-		Vector2f(150, 325),
-		Vector2f(150, 225),
-		Vector2f(400, 225),
-		Vector2f(400, 125),
-		Vector2f(300, 125),
-		Vector2f(300, -20)
-	};
-
-	
-
 	//path
 	Path* m_pCurrentPath;
 	Path* m_pFuturePath;
 
-
-
 	// tower
 	std::vector<Tower*> m_pTowers;
-
 
 	//enemy
 	std::vector<Enemy*> m_pEnemies;

@@ -5,7 +5,7 @@ class Enemy;
 class Tower
 {
 public:
-	Tower(Vector2f position);
+	explicit Tower(Vector2f position);
 	~Tower();
 
 	void Draw() const;
@@ -19,25 +19,19 @@ public:
 
 	void ChangeShootState(bool isShooting);
 
-	bool IsFocusEnemyInRange();
+	bool IsFocusEnemyInRange() const;
 
 	//getters
 
-	Rectf GetRange();
+	Rectf GetRange() const;
+	Rectf GetHitBox() const;
 
-	bool HasEnemy();
+	bool HasEnemy() const;
 
 private:
 
-	enum class State
-	{
-		Inactive,
-		Shooting
-	};
-
 	bool m_IsShooting;
 
-	State m_TowerState;
 	Rectf m_Position;
 	Rectf m_Range;
 	int m_Damage;

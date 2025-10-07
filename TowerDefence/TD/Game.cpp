@@ -1,11 +1,9 @@
 #include "pch.h"
 #include "Game.h"
-#include "Texture.h"
 #include "utils.h"
 #include "Enemy.h"
 #include "Path.h"
 #include "Tower.h"
-#include "iostream"
 
 
 Game::Game( const Window& window ) 
@@ -23,22 +21,12 @@ void Game::Initialize( )
 {
 	InitPath();
 
-	MakeNewWave();
-
 	InitGame();
-
-	m_LivesText = new Texture("Lives: 20", "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
-	m_RoundText = new Texture("Press \'SPACE\' to start round", "Minecraft.ttf", 12.f, Color4f(0.f, 0.f, 0.f, 1.f));
-	m_TowerText = new Texture("Towers: 3", "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
-	m_PauzeText = new Texture("PAUSE", "Minecraft.ttf", 100.f, Color4f(1.f, 1.f, 1.f, 1.f));
-	m_StartText = new Texture("Press 'space' to start again", "Minecraft.ttf", 25.f, Color4f(1.f, 1.f, 1.f, 1.f));
 }
 
 void Game::Cleanup( )
 {
-
 	delete m_pCurrentPath;
-
 	m_pCurrentPath = nullptr;
 
 	for (int i{ 0 }; i < m_pEnemies.size(); i++)
@@ -53,28 +41,12 @@ void Game::Cleanup( )
 		m_pTowers.at(i) = nullptr;
 	}
 
-	delete m_LivesText;
-	m_LivesText = nullptr;
-
-	delete m_TowerText;
-	m_TowerText = nullptr;
-
-	delete m_RoundText;
-	m_RoundText = nullptr;
-
-	delete m_PauzeText;
-	m_PauzeText = nullptr;
-
-	delete m_StartText;
-	m_StartText = nullptr;
-
 	delete m_pFuturePath;
 	m_pFuturePath = nullptr;
 }
 
 void Game::Update( float elapsedSec )
 {
-
 	m_ShowPlacement = false;
 
 	// Check keyboard state
@@ -82,9 +54,9 @@ void Game::Update( float elapsedSec )
 
 	switch (m_GameState)
 	{
-	case Game::GameState::none:
+	case Game::GameState::pauze:
 
-		if (pKeyboardStates[SDL_SCANCODE_SPACE])
+		if (pKeyboardStates[SDL_SCANCODE_ESCAPE])
 		{
 			SetState(GameState::mainloop);
 		}
@@ -92,18 +64,26 @@ void Game::Update( float elapsedSec )
 		break;
 	case Game::GameState::start:
 
+		m_WaveTimer += elapsedSec;
+
 		if (pKeyboardStates[SDL_SCANCODE_SPACE])
 		{
+			MakeNewWave();
+
 			SetState(GameState::mainloop);
 
-			m_RoundText = new Texture("Round: 1", "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
+			m_WaveTimer = 0.f;
+
+			m_RoundText = Texture("Round: 1", "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
 		}
 		break;
 	case Game::GameState::mainloop:
 
+		m_WaveTimer += elapsedSec;
+
 		if (pKeyboardStates[SDL_SCANCODE_ESCAPE])
 		{
-			SetState(GameState::none);
+			SetState(GameState::pauze);
 		}
 
 		for (int t{ 0 }; t < m_pTowers.size(); t++)
@@ -137,15 +117,18 @@ void Game::Update( float elapsedSec )
 			break;
 		}
 
+		
 		for (int e{ 0 }; e < m_pEnemies.size(); e++)
 		{
-			m_pEnemies.at(e)->Update(elapsedSec);
+			if (m_WaveTimer > 3.f)
+			{
+				m_pEnemies.at(e)->Update(elapsedSec);
+			}
 			
 			if (m_pEnemies.at(e)->IsDead())
 			{
-				//remove enemy at that position in the vector
+				delete m_pEnemies.at(e);
 				m_pEnemies.erase(m_pEnemies.begin() + e);
-				// remove the enemy from the turret focus
 				
 				for (int t{ 0 }; t < m_pTowers.size(); t++)
 				{
@@ -156,16 +139,11 @@ void Game::Update( float elapsedSec )
 			{
 				m_Lives--;
 
-				delete m_LivesText;
-				m_LivesText = nullptr;
-
 				std::string text{ "Lives: " + std::to_string(m_Lives) };
+				m_LivesText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
 
-				m_LivesText = new Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
-
-				//remove enemy at that position in the vector
+				delete m_pEnemies[e];
 				m_pEnemies.erase(m_pEnemies.begin() + e);
-				// remove the enemy from the turret focus
 
 				for (int t{ 0 }; t < m_pTowers.size(); t++)
 				{
@@ -174,82 +152,140 @@ void Game::Update( float elapsedSec )
 			}
 		}
 
-		if (m_pEnemies.size() == 0)
+		if (m_pEnemies.empty())
 		{
 			if (pKeyboardStates[SDL_SCANCODE_SPACE])
 			{
 				m_RoundNr++;
 
+				if (m_RoundNr == 10)
+				{
+					m_GameState = GameState::gameOver;
+				}
+
+				m_WaveTimer = 0.f;
+
+				if (m_RoundNr % 2 == 0)
+				{
+					m_MaxTowers++;
+				}
+				else
+				{
+					m_MaxRemoves++;
+				}
+
+				delete m_pCurrentPath;
 				m_pCurrentPath = m_pFuturePath;
 
-				m_pFuturePath = (new Path(m_Playfield));
+
+				m_pFuturePath = new Path(m_Playfield);
 
 				MakeNewWave();
 
-				delete m_RoundText;
-				m_RoundText = nullptr;
-
-				std::string text{ "Round: " + std::to_string(m_RoundNr)};
-				m_RoundText = new Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
+				const std::string text{ "Round: " + std::to_string(m_RoundNr)};
+				m_RoundText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
 			}
 		}
-
-
 		break;
 	case Game::GameState::gameOver:
 
+		if (pKeyboardStates[SDL_SCANCODE_R])
+		{
+			m_RoundNr = 1;
+			m_MaxTowers = 3;
+			m_Lives = 20;
+			m_WaveTimer = 0.f;
+
+			delete m_pCurrentPath;
+			m_pCurrentPath = nullptr;
+
+			delete m_pFuturePath;
+			m_pFuturePath = nullptr;
+
+			InitPath();
+
+			for (int i{ 0 }; i < m_pEnemies.size(); i++)
+			{
+				delete m_pEnemies.at(i);
+			}
+			m_pEnemies.clear();
+
+			for (int i{ 0 }; i < m_pTowers.size(); i++)
+			{
+				delete m_pTowers.at(i);
+			}
+			m_pTowers.clear();
+
+			SetState(GameState::start);
+
+			ResetText();
+		}
+	
 		break;
 	default:
 		break;
 	}
-
-	delete m_TowerText;
-	m_TowerText = nullptr;
-
-	std::string text{ "Towers: " + std::to_string((m_RoundNr + 2) - m_pTowers.size()) };
-	m_TowerText = new Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
 }
 
 void Game::Draw( ) const
 {
 	ClearBackground( );
 
-	
-
-	//path
-	m_pCurrentPath->Draw();
-
-	//enemy
-	
-	//m_Enemy->Draw();
-
-	for (int i{ 0 }; i < m_pEnemies.size(); i++)
-	{
-		m_pEnemies.at(i)->Draw();
-	}
-
 	//tower
 
-	int mouseX{}, mouseY{};
-	Uint32 pressed = SDL_GetMouseState(&mouseX, &mouseY);
+	int x{}, y{};
+	const Uint32 pressed = SDL_GetMouseState(&x, &y);
+
+	const float  mouseX{ static_cast<float>(x) };
+	float  mouseY{ static_cast<float>(y) };
 
 	mouseY = GetViewPort().height - mouseY;
 
-	if (pressed && SDL_BUTTON(SDL_BUTTON_LEFT))
+	if (pressed == 1)
 	{
 		utils::SetColor(Color4f(0.f, 1.f, 0.f, 0.5f));
 		utils::FillRect(mouseX - 10.f, mouseY - 10.f, 20.f, 20.f);
 
 		utils::SetColor(Color4f(1.f, 1.f, 0.f, 0.5f));
 		utils::DrawRect(mouseX - 60.f, mouseY - 60.f, 120.f, 120.f);
-
 	}
 
-	for (int i{ 0 }; i < m_pTowers.size(); i++)
+	m_pCurrentPath->Draw();
+
+	const Rectf m_FutureField{ 525.f, 25.f, 150.f, 150.f };
+
+	if (m_GameState == GameState:: start || m_GameState == GameState::mainloop)
 	{
-		m_pTowers.at(i)->Draw();
+		if (!m_pTowers.empty())
+		{
+			for (int i{ 0 }; i < m_pTowers.size(); i++)
+			{
+				m_pTowers.at(i)->Draw();
+			}
+		}
 	}
 
+	switch (m_GameState)
+	{
+	case Game::GameState::pauze:
+		m_PauzeText.Draw(Vector2f(100.f, GetViewPort().height / 2));
+		m_StartText.Draw(Vector2f(95.f, GetViewPort().height / 2 - 25.f));
+		break;
+	case Game::GameState::start:
+		utils::SetColor(Color4f(1.f, 1.f, 1.f, 1.f));
+		break;
+	case Game::GameState::mainloop:
+		for (int i{ 0 }; i < m_pEnemies.size(); i++)
+		{
+			m_pEnemies.at(i)->Draw();
+		}
+		break;
+	case Game::GameState::gameOver:
+		m_RestartText.Draw(Vector2f(100.f, GetViewPort().height / 2));
+		break;
+	default:
+		break;
+	}
 
 	//infofield
 	utils::SetColor(Color4f(0.f, 1.f, 1.f, 1.f));
@@ -258,16 +294,11 @@ void Game::Draw( ) const
 	utils::SetColor(Color4f(0.f, 0.f, 0.f, 1.f));
 	utils::FillRect(m_FutureField);
 
-	
-
 	//text
-	m_LivesText->Draw(Vector2f(520.f, 350.f));
-	m_RoundText->Draw(Vector2f(520.f, 450.f));
-	m_TowerText->Draw(Vector2f(520.f, 300.f));
-
-
-	Rectf m_FutureField{ 525.f, 25.f, 150.f, 150.f };
-
+	m_LivesText.Draw(Vector2f(520.f, 350.f));
+	m_RoundText.Draw(Vector2f(520.f, 450.f));
+	m_TowerText.Draw(Vector2f(520.f, 300.f));
+	m_RemovalsText.Draw(Vector2f(520.f, 250.f));
 
 	glPushMatrix();
 
@@ -277,42 +308,22 @@ void Game::Draw( ) const
 
 	m_pFuturePath->Draw();
 
-
-	if (pressed && SDL_BUTTON(SDL_BUTTON_LEFT))
-	{
-		utils::SetColor(Color4f(0.f, 1.f, 0.f, 0.5f));
-		utils::FillRect(mouseX - 10.f, mouseY - 10.f, 20.f, 20.f);
-
-		utils::SetColor(Color4f(1.f, 1.f, 0.f, 0.5f));
-		utils::DrawRect(mouseX - 60.f, mouseY - 60.f, 120.f, 120.f);
-
-	}
-
 	for (int i{ 0 }; i < m_pTowers.size(); i++)
 	{
 		m_pTowers.at(i)->Draw();
 	}
 
 
-	glPopMatrix();
-
-
-	switch (m_GameState)
+	if (pressed == 1)
 	{
-	case Game::GameState::none:
-		m_PauzeText->Draw(Vector2f(100.f, GetViewPort().height / 2));
-		m_StartText->Draw(Vector2f(95.f, GetViewPort().height / 2 - 25.f));
-		break;
-	case Game::GameState::start:
-		break;
-	case Game::GameState::mainloop:
-		break;
-	case Game::GameState::gameOver:
-		break;
-	default:
-		break;
+		utils::SetColor(Color4f(0.f, 1.f, 0.f, 0.5f));
+		utils::FillRect(mouseX - 10.f, mouseY - 10.f, 20.f, 20.f);
+
+		utils::SetColor(Color4f(1.f, 1.f, 0.f, 0.5f));
+		utils::DrawRect(mouseX - 60.f, mouseY - 60.f, 120.f, 120.f);
 	}
 
+	glPopMatrix();
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
@@ -345,26 +356,46 @@ void Game::ProcessMouseMotionEvent( const SDL_MouseMotionEvent& e )
 
 void Game::ProcessMouseDownEvent( const SDL_MouseButtonEvent& e )
 {
+	const Vector2f mousePos{ static_cast<float>(e.x), static_cast<float>(e.y) };
+
+	std::string text{};
 	//std::cout << "MOUSEBUTTONDOWN event: ";
 	switch ( e.button )
 	{
 	case SDL_BUTTON_LEFT:
-
-		m_ShowPlacement = true;
-
 		break;
 	case SDL_BUTTON_RIGHT:
-		std::cout << " right button " << std::endl;
+
+		if (m_MaxRemoves > 0)
+		{
+			for (int i{ 0 }; i < m_pTowers.size(); i++)
+			{
+				if (utils::IsPointInRect(mousePos, m_pTowers[i]->GetHitBox()))
+				{
+					delete m_pTowers[i];
+					m_pTowers.erase(m_pTowers.begin() + i);
+
+					m_MaxRemoves--;
+				}
+			}
+		}
+		text = "Remove: " + std::to_string(m_MaxRemoves);
+		m_RemovalsText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
+
+		text = "Towers: " + std::to_string((m_MaxTowers)-m_pTowers.size());
+		m_TowerText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
+
 		break;
 	case SDL_BUTTON_MIDDLE:
-		std::cout << " middle button " << std::endl;
 		break;
+	default: ;
 	}
 	
 }
 
 void Game::ProcessMouseUpEvent( const SDL_MouseButtonEvent& e )
 {
+	std::string text{};
 	//std::cout << "MOUSEBUTTONUP event: ";
 	switch ( e.button )
 	{
@@ -372,23 +403,26 @@ void Game::ProcessMouseUpEvent( const SDL_MouseButtonEvent& e )
 
 		if (m_GameState != GameState::gameOver)
 		{
-			if (m_pTowers.size() < m_RoundNr + 2)
+			if (e.x < 500.f)
 			{
-				m_pTowers.push_back(new Tower(Vector2f(e.x, e.y)));
+				if (m_pTowers.size() < m_MaxTowers)
+				{
+					m_pTowers.push_back(new Tower(Vector2f(e.x, e.y)));
+				}
 			}
-
 		}
+
+		text = "Towers: " + std::to_string((m_MaxTowers)-m_pTowers.size());
+		m_TowerText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
 
 		break;
 	case SDL_BUTTON_RIGHT:
-		std::cout << " right button " << std::endl;
 		break;
 	case SDL_BUTTON_MIDDLE:
-		std::cout << " middle button " << std::endl;
+
 		break;
+	default: ;
 	}
-
-
 }
 
 void Game::ClearBackground( ) const
@@ -400,6 +434,9 @@ void Game::ClearBackground( ) const
 void Game::InitGame()
 {
 	SetState(GameState::start);
+
+	m_pTowers.reserve(15);
+	//m_pEnemies.reserve(30);
 }
 
 void Game::InitPath()
@@ -409,23 +446,37 @@ void Game::InitPath()
 	m_pFuturePath = new Path(m_Playfield);
 }
 
-void Game::SetState(GameState state)
+void Game::SetState(const GameState state)
 {
 	m_GameState = state;
 }
 
 void Game::MakeNewWave()
 {
+	const int enemyAmount{ 4 + 2*m_RoundNr };
 
-	int enemyAmount{ 4 * m_RoundNr };
-
-	Vector2f startPos{ m_pCurrentPath->GetFirstPosition() };
+	const Vector2f startPos{ m_pCurrentPath->GetFirstPosition() };
 	std::vector<Vector2f> m_FirstWave{};
 	
 	for (int i{ 1 }; i <= enemyAmount; i++)
 	{
-		//													position									path		type
-		m_pEnemies.push_back(new Enemy(Vector2f(startPos.x + (-50.f * i), startPos.y), m_pCurrentPath, 1));
+		m_pEnemies.push_back(new Enemy(Vector2f(startPos.x + (-50.f * i), startPos.y), m_pCurrentPath, m_RoundNr));
 	}
+}
 
+void Game::ResetText()
+{
+	std::string text{ "Round: " + std::to_string(m_RoundNr) };
+	m_RoundText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
+
+
+	text = "Towers: " + std::to_string((m_MaxTowers)-m_pTowers.size());
+	m_TowerText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
+
+	text = "Remove: 0";
+	m_RemovalsText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
+
+
+	text = "Lives: " + std::to_string(m_Lives);
+	m_LivesText = Texture(text, "Minecraft.ttf", 25.f, Color4f(0.f, 0.f, 0.f, 1.f));
 }

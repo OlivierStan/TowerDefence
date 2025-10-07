@@ -2,16 +2,15 @@
 #include "Tower.h"
 #include "utils.h"
 #include "Enemy.h"
-#include "Bullet.h"
 
-Tower::Tower(Vector2f position)
-	:m_Size{ 20.f }
+Tower::Tower(const Vector2f position)
+	:m_IsShooting{ false }
+	,m_Damage{ 5 }
+	,m_Size{ 20.f }
 	,m_ShootTimer{ 0.f }
 	,m_pFocusEnemy{ nullptr }
-	,m_Damage{ 5 }
-	,m_IsBulletVisible{ false }
 	,m_BulletTimer{ 0.f }
-	,m_IsShooting{ false }
+	,m_IsBulletVisible{ false }
 {
 	m_Position = Rectf(position.x - m_Size / 2, position.y - m_Size / 2, m_Size, m_Size);
 	m_Range = Rectf(position.x - m_Size*3.f, position.y - m_Size*3.f, m_Size * 6, m_Size * 6);
@@ -19,9 +18,6 @@ Tower::Tower(Vector2f position)
 
 Tower::~Tower()
 {
-	//delete m_pBullet;
-	//m_pBullet = nullptr;
-
 	delete m_pFocusEnemy;
 	m_pFocusEnemy = nullptr;
 }
@@ -32,11 +28,9 @@ void Tower::Draw() const
 	utils::SetColor(Color4f(0.f, 1.f, 0.f, 1.f));
 	utils::FillRect(m_Position);
 
-
 	//DrawRange
 	utils::SetColor(Color4f(1.f, 1.f, 0.f, 1.f));
 	utils::DrawRect(m_Range);
-
 
 	//DrawLaser
 	if (m_IsBulletVisible && m_pFocusEnemy != nullptr)
@@ -46,11 +40,15 @@ void Tower::Draw() const
 	}
 }
 
-Rectf Tower::GetRange()
+Rectf Tower::GetRange() const
 {
 	return m_Range;
 }
 
+Rectf Tower::GetHitBox() const
+{
+	return m_Position;
+}
 
 void Tower::SetShooting(Enemy* enemy)
 {
@@ -64,18 +62,17 @@ void Tower::RemoveEnemy()
 	m_pFocusEnemy = nullptr;
 }
 
-void Tower::ChangeShootState(bool isShooting)
+void Tower::ChangeShootState(const bool isShooting)
 {
 	m_IsShooting = isShooting;
 }
 
-bool Tower::IsFocusEnemyInRange()
+bool Tower::IsFocusEnemyInRange() const
 {
 	return utils::IsPointInRect(m_pFocusEnemy->GetPosition(), m_Range);
 }
 
-
-void Tower::Update(float elapsedSec)
+void Tower::Update(const float elapsedSec)
 {
 	if (m_IsShooting && m_pFocusEnemy != nullptr)
 	{
@@ -103,7 +100,7 @@ void Tower::Update(float elapsedSec)
 	//m_pBullet->Update(elapsedSec);
 }
 
-bool Tower::HasEnemy()
+bool Tower::HasEnemy() const
 {
 	return m_pFocusEnemy != nullptr;
 }

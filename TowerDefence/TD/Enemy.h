@@ -6,25 +6,24 @@ class Enemy
 {
 public:
 
-	Enemy(const Vector2f& position, Path* path, int type);
-	~Enemy();
+	Enemy(const Vector2f& position, Path* path, int hp);
 
 	void Draw() const;
 
 	void Update(float elapsedSec);
 	void Move(float elapsedSec);
 
-	float GetDistance();
+	float GetDistance() const;
 
-	bool IsInRange(Rectf towerRange);
+	bool IsInRange(Rectf towerRange) const;
 
-	Vector2f GetPosition();
+	Vector2f GetPosition() const;
 
 	void IsHit(int damage);
 
-	bool IsDead();
+	bool IsDead() const;
 
-	bool ReachedEnd();
+	bool ReachedEnd() const;
 
 private:
 

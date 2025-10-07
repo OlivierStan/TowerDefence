@@ -1,17 +1,28 @@
-﻿  Game.cpp
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(30,58): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(31,79): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(32,58): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(33,54): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(34,77): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(99,59): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(164,54): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(193,54): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(210,51): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(236,32): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(377,50): warning C4244: 'argument': conversion from 'const Sint32' to 'float', possible loss of data
-C:\Users\stano\Github\TowerDefence\TowerDefence\TD\Game.cpp(377,45): warning C4244: 'argument': conversion from 'const Sint32' to 'float', possible loss of data
-  TD.vcxproj -> C:\Users\stano\Github\TowerDefence\TowerDefence\x64\Debug\TD.exe
+﻿  Enemy.cpp
+  Game.cpp
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Enemy.cpp(22,41): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Enemy.cpp(22,33): warning C4244: 'argument': conversion from 'const int' to 'float', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(77,55): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(143,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(186,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(383,51): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(386,48): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(410,51): warning C4244: 'argument': conversion from 'const Sint32' to 'float', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(410,46): warning C4244: 'argument': conversion from 'const Sint32' to 'float', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(416,48): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(470,47): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(474,47): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(477,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Game.cpp(481,47): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  InfoField.cpp
+  main.cpp
+  Path.cpp
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Path.cpp(32,25): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\TD\Path.cpp(37,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  pch.cpp
+  Tower.cpp
+  Wave.cpp
+  TD.vcxproj -> C:\Users\stano\Github\TowerDefenceSchool\TowerDefence\x64\Debug\FixedFrontline.exe
   0 File(s) copied
   0 File(s) copied
   0 File(s) copied

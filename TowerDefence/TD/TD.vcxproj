@@ -74,6 +74,7 @@
     <IncludePath>$(SolutionDir)\Libraries\SDLTtf\SDL2_ttf-2.24.0\include;$(SolutionDir)\Libraries\SDLMixer\SDL2_mixer-2.8.0\include;$(SolutionDir)\Libraries\SDLImage\SDL2_image-2.8.4\include;$(SolutionDir)\Libraries\SDLMain\SDL2-2.30.11\include;$(SolutionDir)\Engine;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\x64\Debug;$(SolutionDir)\Libraries\SDLTtf\SDL2_ttf-2.24.0\lib\x64;$(SolutionDir)\Libraries\SDLMixer\SDL2_mixer-2.8.0\lib\x64;$(SolutionDir)\Libraries\SDLImage\SDL2_image-2.8.4\lib\x64;$(SolutionDir)\Libraries\SDLMain\SDL2-2.30.11\lib\x64;$(LibraryPath)</LibraryPath>
     <CustomBuildAfterTargets>BuildCompile</CustomBuildAfterTargets>
+    <TargetName>FixedFrontline</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -157,9 +158,6 @@ xcopy "$(SolutionDir)Resources\*.*" "$(TargetDir)" /y /d /s</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bullet.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Enemy.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -184,7 +182,6 @@ xcopy "$(SolutionDir)Resources\*.*" "$(TargetDir)" /y /d /s</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InfoField.h" />
@@ -202,5 +199,12 @@ xcopy "$(SolutionDir)Resources\*.*" "$(TargetDir)" /y /d /s</Command>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)\Libraries\SDLTtf\SDL2_ttf-2.24.0\include;$(SolutionDir)\Libraries\SDLMixer\SDL2_mixer-2.8.0\include;$(SolutionDir)\Libraries\SDLImage\SDL2_image-2.8.4\include;$(SolutionDir)\Libraries\SDLMain\SDL2-2.30.11\include;$(SolutionDir)\Engine;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\x64\Release;$(SolutionDir)\Libraries\SDLTtf\SDL2_ttf-2.24.0\lib\x64;$(SolutionDir)\Libraries\SDLMixer\SDL2_mixer-2.8.0\lib\x64;$(SolutionDir)\Libraries\SDLImage\SDL2_image-2.8.4\lib\x64;$(SolutionDir)\Libraries\SDLMain\SDL2-2.30.11\lib\x64;$(LibraryPath)</LibraryPath>
+    <TargetName>FixedFrontline</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>FixedFrontline</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>FixedFrontline</TargetName>
   </PropertyGroup>
 </Project>

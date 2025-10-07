@@ -12,22 +12,21 @@ public:
 		Right
 	};
 
-
-	Path(const Rectf viewport);
+	explicit Path(const Rectf viewport);
 	
 	void Draw() const;
 	
-	Vector2f GetNextPosition(int nextPos);
+	Vector2f GetNextPosition(int nextPos) const;
 
-	int GetSize();
+	int GetSize() const;
 
 	Vector2f GetRandomPointOnEdge(Edge edge);
 	
 	std::vector<Vector2f> GenerateRandomPath();
 
-	Vector2f GetFirstPosition();
+	Vector2f GetFirstPosition() const;
 
-	Edge GetEdge();
+	Edge GetEdge() const;
 
 private:
 
